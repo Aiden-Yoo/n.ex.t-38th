@@ -1,0 +1,6 @@
+leaf:
+  groups:
+    - leaf
+spine:
+  groups:
+    - spine

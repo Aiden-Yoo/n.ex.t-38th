@@ -1,0 +1,40 @@
+---
+arista1:
+  hostname: 192.168.1.51
+  username: admin
+  password: admin
+  platform: eos
+  data:
+    groups:
+      - arista
+      - leaf
+
+arista2:
+  hostname: 192.168.1.52
+  username: admin
+  password: admin
+  platform: eos
+  data:
+    groups:
+      - arista
+      - leaf
+
+arista3:
+  hostname: 192.168.1.53
+  username: admin
+  password: admin
+  platform: eos
+  data:
+    groups:
+      - arista
+      - spine
+
+arista4:
+  hostname: 192.168.1.54
+  username: admin
+  password: admin
+  platform: eos
+  data:
+    groups:
+      - arista
+      - spine

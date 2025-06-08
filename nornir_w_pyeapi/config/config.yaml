@@ -1,0 +1,22 @@
+---
+inventory:
+  plugin: SimpleInventory
+  options:
+    host_file: "config/hosts.yaml"
+    group_file: "config/groups.yaml"
+runner:
+  plugin: threaded
+  options:
+    num_workers: 20
+logging:
+  enabled: true
+  level: INFO
+  log_file: "nornir.log"
+  format: "%(asctime)s - %(name)12s - %(levelname)8s - %(funcName)10s() - %(message)s"
+  to_console: false
+  loggers:
+    - "nornir"
+    - "pyeapi"
+connections:
+  pyeapi:
+    plugin: internal.util.pyeapi_conn.PyeapiConnectionPlugin
