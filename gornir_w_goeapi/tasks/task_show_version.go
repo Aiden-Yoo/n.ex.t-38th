@@ -5,8 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"gornir_w_goeapi/util"
+
 	"github.com/aristanetworks/goeapi"
 	"github.com/nornir-automation/gornir/pkg/gornir"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 type VersionInfo struct {
@@ -30,13 +34,25 @@ type VersionInfo struct {
 	Uptime             float64 `json:"uptime"`
 }
 
-type TaskShowVersion struct{}
+type TaskShowVersion struct {
+	SaveToDB bool
+}
 
 func (t *TaskShowVersion) Run(ctx context.Context, logger gornir.Logger, host *gornir.Host) (gornir.TaskInstanceResult, error) {
 	// get host info
 	hostname := host.Hostname
 	username := host.Username
 	password := host.Password
+
+	// DB file path
+	db, err := gorm.Open(sqlite.Open("results.db"), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		sqlDB, _ := db.DB()
+		sqlDB.Close()
+	}()
 
 	// initialize result struct
 	info := VersionInfo{}
@@ -70,6 +86,13 @@ func (t *TaskShowVersion) Run(ctx context.Context, logger gornir.Logger, host *g
 
 	if err := json.Unmarshal(rawJSON, &info); err != nil {
 		return info, fmt.Errorf("unmarshal failed: %v", err)
+	}
+
+	if t.SaveToDB && db != nil {
+		err = util.SaveCommandResult(db, hostname, "show version", versionData, "show_version")
+		if err != nil {
+			fmt.Println("save failed:", err)
+		}
 	}
 
 	return info, nil

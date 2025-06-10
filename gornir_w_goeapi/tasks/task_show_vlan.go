@@ -10,6 +10,8 @@ import (
 
 	"github.com/aristanetworks/goeapi"
 	"github.com/nornir-automation/gornir/pkg/gornir"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 type VlanInterfaces struct {
@@ -40,7 +42,7 @@ func (t *TaskShowVlan) Run(ctx context.Context, logger gornir.Logger, host *gorn
 	password := host.Password
 
 	// DB file path
-	db, err := util.InitDB("results.db")
+	db, err := gorm.Open(sqlite.Open("results.db"), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
@@ -85,7 +87,7 @@ func (t *TaskShowVlan) Run(ctx context.Context, logger gornir.Logger, host *gorn
 
 	// save to db
 	if t.SaveToDB && db != nil {
-		err = util.SaveCommandResult(db, hostname, "show vlan", versionData)
+		err = util.SaveCommandResult(db, hostname, "show vlan", versionData, "show_vlan")
 		if err != nil {
 			fmt.Println("save failed:", err)
 		}

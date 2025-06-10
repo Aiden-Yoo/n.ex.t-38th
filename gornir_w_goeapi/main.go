@@ -17,6 +17,11 @@ import (
 func main() {
 	log := logger.NewLogrus(false)
 
+	// DB 테이블 선행 생성
+	if _, err := util.InitDB("results.db", "show_vlan", "show_version", "show_interfaces"); err != nil {
+		log.Fatal(err)
+	}
+
 	file := "./config/inventory.yaml"
 	filter := "arista"
 	plugin := inventory.FromYAML{HostsFile: file}
@@ -44,15 +49,17 @@ func main() {
 	// Open an SSH connection towards the devices
 	results, err := gr.RunSync(
 		context.Background(),
-		// &eapi.TaskAll{
-		// 	Tasks: []gornir.Task{
-		// 		&eapi.TaskShowVersion{},
-		// 		&eapi.TaskShowVlan{},
-		// 	},
-		// },
+		&eapi.TaskAll{
+			Tasks: []gornir.Task{
+				&eapi.TaskShowVersion{SaveToDB: true},
+				&eapi.TaskShowVlan{SaveToDB: true},
+				&eapi.TaskShowInterfaces{SaveToDB: true},
+			},
+		},
 		// &eapi.TaskShowVersion{},
 		// &eapi.TaskShowTest{},
-		&eapi.TaskShowVlan{SaveToDB: true},
+		// &eapi.TaskShowVlan{SaveToDB: true},
+		// &eapi.TaskShowInterfaces{SaveToDB: true},
 		// eapi.NewTaskShowAll(),
 	)
 	if err != nil {
